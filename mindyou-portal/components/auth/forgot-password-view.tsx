@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { FormErrorBanner } from "@/components/ui/form-error-banner";
@@ -38,6 +38,22 @@ export function ForgotPasswordView({ type }: { type: AccountType }) {
     return true;
   }, [email]);
 
+  useEffect(() => {
+    if (email) {
+      sessionStorage.setItem("authEmail", email);
+    }
+  }, [email]);
+
+  useEffect(() => {
+    const urlEmail = new URLSearchParams(window.location.search).get("email");
+    if (urlEmail) {
+      setEmail(urlEmail);
+    } else {
+      const saved = sessionStorage.getItem("authEmail");
+      if (saved) setEmail(saved);
+    }
+  }, []);
+
   // Quiet on blur while the field is still empty — errors surface via submit
   // or once real input exists. Never steals focus back mid-form.
   const handleEmailBlur = useCallback(() => {
@@ -52,6 +68,15 @@ export function ForgotPasswordView({ type }: { type: AccountType }) {
     e.preventDefault();
     if (loading || success) return;
     if (!guard()) return;
+
+    if (!navigator.onLine) {
+      setFormError({
+        title: "You're offline",
+        description: "Please reconnect to submit your request."
+      });
+      release();
+      return;
+    }
 
     setFormError(null);
 
@@ -82,6 +107,7 @@ export function ForgotPasswordView({ type }: { type: AccountType }) {
     setLoading(false);
     setSuccess(true);
     release();
+    sessionStorage.removeItem("authEmail");
     toast.success("Reset link sent", {
       description: "Check your inbox for the secure link.",
     });
@@ -131,7 +157,7 @@ export function ForgotPasswordView({ type }: { type: AccountType }) {
             autoComplete="email"
           />
           <Button type="submit" type_={type} loading={loading} success={success}>
-            Reset password
+            Send reset link
           </Button>
         </form>
       </div>

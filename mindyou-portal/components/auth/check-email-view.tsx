@@ -66,6 +66,14 @@ export function CheckEmailView({ type }: { type: AccountType }) {
 
   const handleResend = async () => {
     if (loading || cooldown > 0) return;
+
+    if (!navigator.onLine) {
+      toast.error("You're offline", {
+        description: "Please reconnect to resend the link."
+      });
+      return;
+    }
+
     setLoading(true);
     // DEMO ONLY — swap for the real resend-reset-link API call.
     await new Promise((r) => setTimeout(r, 500));
@@ -182,7 +190,7 @@ export function CheckEmailView({ type }: { type: AccountType }) {
           href={`/${type}/forgot-password`}
           className="font-body text-[13px] font-medium text-ink/50 transition-colors hover:text-ink"
         >
-          Use a different email
+          Start over with a different email
         </Link>
       </div>
     </AuthLayout>

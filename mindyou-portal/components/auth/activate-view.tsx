@@ -63,6 +63,15 @@ export function ActivateView({ type }: { type: AccountType }) {
     if (loading || success) return;
     if (!guard()) return;
 
+    if (!navigator.onLine) {
+      setFormError({
+        title: "You're offline",
+        description: "Please reconnect to submit your request."
+      });
+      release();
+      return;
+    }
+
     setFormError(null);
 
     if (!validateEmailField()) {
@@ -149,6 +158,7 @@ export function ActivateView({ type }: { type: AccountType }) {
             onBlur={handleEmailBlur}
             error={emailError}
             valid={isValidEmail(email)}
+            hint="We'll send a new activation link to this address"
             autoComplete="email"
           />
 

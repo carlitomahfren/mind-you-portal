@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const STRENGTH_LABELS = ["Too weak", "Weak", "Fair", "Good", "Strong"] as const;
@@ -41,6 +41,8 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
         ? "text-enterprise-dark"
         : "text-success";
 
+  const shouldReduceMotion = useReducedMotion();
+
   if (!password) return null;
 
   return (
@@ -58,7 +60,7 @@ export function PasswordStrength({ password }: PasswordStrengthProps) {
                 animate={{
                   scaleX: segment < score ? 1 : 0,
                 }}
-                transition={{ type: "spring", stiffness: 420, damping: 30 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 30 }}
               />
             </div>
           ))}

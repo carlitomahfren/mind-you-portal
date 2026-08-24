@@ -63,6 +63,14 @@ export function ActivationSentView({ type }: { type: AccountType }) {
 
   const handleResend = async () => {
     if (loading || cooldown > 0) return;
+
+    if (!navigator.onLine) {
+      toast.error("You're offline", {
+        description: "Please reconnect to resend the link."
+      });
+      return;
+    }
+
     setLoading(true);
     // DEMO ONLY — swap this block for the real resend-activation API call.
     await new Promise((r) => setTimeout(r, 500));
@@ -181,7 +189,7 @@ export function ActivationSentView({ type }: { type: AccountType }) {
           href={`/${type}/activate`}
           className="font-body text-[13px] font-medium text-ink/50 transition-colors hover:text-ink"
         >
-          Change activation email
+          Start over with a different email
         </Link>
       </div>
     </AuthLayout>

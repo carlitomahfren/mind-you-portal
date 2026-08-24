@@ -9,7 +9,7 @@ import {
   useRef,
 } from "react";
 import { Eye, EyeOff, Check } from "lucide-react";
-import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
+import { motion, AnimatePresence, useAnimationControls, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { AccountType } from "@/lib/brand";
 
@@ -63,6 +63,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     const hasValue = props.value !== undefined ? props.value !== "" : hasInternalValue;
     const isFloating = focused || hasValue;
     const showValidMark = valid && hasValue && !error;
+    const shouldReduceMotion = useReducedMotion();
     const accentClasses =
       type_ === "enterprise"
         ? "focus:border-enterprise/60 focus:ring-enterprise/10"
@@ -124,7 +125,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
     const controls = useAnimationControls();
 
     useEffect(() => {
-      if (error) {
+      if (error && !shouldReduceMotion) {
         controls.start({
           x: [0, -6, 6, -4, 4, 0],
           transition: { duration: 0.3, ease: "easeInOut" },
@@ -132,7 +133,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       } else {
         controls.set({ x: 0 });
       }
-    }, [error, controls]);
+    }, [error, controls, shouldReduceMotion]);
 
     const message = error ?? undefined;
     const messageKey = message
@@ -187,10 +188,10 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           {showValidMark && (
             <AnimatePresence>
               <motion.span
-                initial={{ scale: 0, opacity: 0 }}
+                initial={shouldReduceMotion ? false : { scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 450, damping: 26 }}
+                exit={shouldReduceMotion ? undefined : { scale: 0.5, opacity: 0 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 450, damping: 26 }}
                 className={cn(
                   "pointer-events-none absolute top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-success",
                   isPassword ? "right-10" : "right-3"
@@ -202,25 +203,34 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             </AnimatePresence>
           )}
           {isPassword && (
-            <button
-              type="button"
-              onClick={() => setShow((s) => !s)}
-              aria-label={show ? "Hide password" : "Show password"}
-              className="absolute right-2.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-ink/40 transition-colors hover:text-ink hover:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:ring-offset-2 outline-none"
-            >
-              <AnimatePresence mode="wait">
-                <motion.span
-                  key={show ? "off" : "on"}
-                  initial={{ rotateY: 90, opacity: 0 }}
-                  animate={{ rotateY: 0, opacity: 1 }}
-                  exit={{ rotateY: -90, opacity: 0 }}
-                  transition={{ duration: 0.18, ease: "easeInOut" }}
-                  className="flex"
-                >
-                  {show ? <EyeOff size={16} /> : <Eye size={16} />}
-                </motion.span>
-              </AnimatePresence>
-            </button>
+            <div className="absolute inset-0 group">
+              <button
+                type="button"
+                onClick={() => setShow((s) => !s)}
+                aria-label={show ? "Hide password" : "Show password"}
+                className="absolute right-2.5 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-ink/40 transition-colors hover:text-ink hover:bg-ink/5 focus-visible:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:ring-offset-2 outline-none"
+              >
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={show ? "off" : "on"}
+                    initial={shouldReduceMotion ? false : { rotateY: 90, opacity: 0 }}
+                    animate={{ rotateY: 0, opacity: 1 }}
+                    exit={shouldReduceMotion ? undefined : { rotateY: -90, opacity: 0 }}
+                    transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.18, ease: "easeInOut" }}
+                    className="flex"
+                  >
+                    {show ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </motion.span>
+                </AnimatePresence>
+              </button>
+              <div
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap rounded px-2 py-1 text-[11px] font-medium text-ink bg-white/95 shadow-lg border border-hairline backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+                style={{ zIndex: 10 }}
+                aria-hidden="true"
+              >
+                {show ? "Hide password" : "Show password"}
+              </div>
+            </div>
           )}
         </motion.div>
 

@@ -239,7 +239,7 @@ export function AuthLayout({
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 420, damping: 28 }}
-                className="group rounded-full bg-white px-7 py-3 font-display text-[12px] font-bold tracking-wider text-abyss shadow-lg transition-all hover:bg-white hover:shadow-[0_8px_32px_rgba(255,255,255,0.25)] xl:px-8 xl:py-3.5 xl:text-[13px]"
+                className="group rounded-full bg-white px-7 py-3 font-display text-[12px] font-bold tracking-wider text-abyss shadow-lg transition-all hover:bg-white hover:shadow-[0_8px_32px_rgba(255,255,255,0.25)] focus-visible:ring-2 focus-visible:ring-abyss/40 focus-visible:ring-offset-2 focus-visible:ring-offset-abyss xl:px-8 xl:py-3.5 xl:text-[13px]"
               >
                 <span className="inline-flex items-center gap-2">
                   SIGN UP
@@ -256,7 +256,7 @@ export function AuthLayout({
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                 transition={{ type: "spring", stiffness: 420, damping: 28 }}
-                className="group rounded-full bg-white/10 backdrop-blur-md px-7 py-3 font-display text-[12px] font-bold tracking-wider text-white border border-white/20 shadow-lg transition-all hover:bg-white/20 hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.1)] xl:px-8 xl:py-3.5 xl:text-[13px]"
+                className="group rounded-full bg-white/10 backdrop-blur-md px-7 py-3 font-display text-[12px] font-bold tracking-wider text-white border border-white/20 shadow-lg transition-all hover:bg-white/20 hover:border-white/40 hover:shadow-[0_8px_32px_rgba(255,255,255,0.1)] focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-abyss xl:px-8 xl:py-3.5 xl:text-[13px]"
               >
                 <span className="inline-flex items-center gap-2">
                   CONTACT US

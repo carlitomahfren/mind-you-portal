@@ -78,6 +78,15 @@ export function RegisterView({ type }: { type: AccountType }) {
     if (loading || success) return;
     if (!guard()) return;
 
+    if (!navigator.onLine) {
+      setFormError({
+        title: "You're offline",
+        description: "Please reconnect to submit your request."
+      });
+      release();
+      return;
+    }
+
     setFormError(null);
 
     if (!firstName.trim()) {

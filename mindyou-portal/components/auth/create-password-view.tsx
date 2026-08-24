@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Check, Link2Off } from "lucide-react";
 import { AuthLayout } from "@/components/auth/auth-layout";
+import { FormErrorBanner } from "@/components/ui/form-error-banner";
 import { TextField } from "@/components/ui/text-field";
 import { Button } from "@/components/ui/button";
 import { PasswordStrength } from "@/components/ui/password-strength";
@@ -36,6 +37,10 @@ export function CreatePasswordView({ type }: { type: AccountType }) {
   const [success, setSuccess] = useState(false);
   const [bridging, setBridging] = useState(false);
   const [touched, setTouched] = useState(false);
+  const [formError, setFormError] = useState<{
+    title: string;
+    description?: string;
+  } | null>(null);
   const confirmRef = useRef<HTMLInputElement | null>(null);
 
   // DEMO ONLY — a real integration validates the token server-side.
@@ -57,6 +62,15 @@ export function CreatePasswordView({ type }: { type: AccountType }) {
     e.preventDefault();
     if (loading || success) return;
     if (!guard()) return;
+
+    if (!navigator.onLine) {
+      setFormError({
+        title: "You're offline",
+        description: "Please reconnect to submit your request."
+      });
+      release();
+      return;
+    }
 
     setTouched(true);
     if (!allValid || !matches) {
@@ -100,6 +114,13 @@ export function CreatePasswordView({ type }: { type: AccountType }) {
         <h2 className="mb-7 font-display text-[21px] font-semibold tracking-tight text-ink sm:mb-8 sm:text-[23px]">
           Create password
         </h2>
+
+        <FormErrorBanner
+          open={!!formError}
+          title={formError?.title ?? ""}
+          description={formError?.description}
+          className="mb-4"
+        />
 
         {tokenState === "pending" && (
           <div className="flex flex-col gap-4" aria-busy="true" aria-label="Checking your link">

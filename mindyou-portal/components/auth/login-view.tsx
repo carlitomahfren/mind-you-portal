@@ -65,6 +65,17 @@ export function LoginView({ type }: { type: AccountType }) {
     return () => clearTimeout(id);
   }, [lockLeft]);
 
+  useEffect(() => {
+    if (email) {
+      sessionStorage.setItem("authEmail", email);
+    }
+  }, [email]);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("authEmail");
+    if (saved) setEmail(saved);
+  }, []);
+
   const copy = rightCopy[type];
   const accentText =
     type === "enterprise" ? "text-enterprise-dark" : "text-personal-dark";
@@ -92,6 +103,15 @@ export function LoginView({ type }: { type: AccountType }) {
     e.preventDefault();
     if (locked || loading || success) return;
     if (!guard()) return;
+
+    if (!navigator.onLine) {
+      setFormError({
+        title: "You're offline",
+        description: "Please reconnect to submit your request."
+      });
+      release();
+      return;
+    }
 
     setFormError(null);
 
@@ -135,6 +155,7 @@ export function LoginView({ type }: { type: AccountType }) {
     setLoading(false);
     setSuccess(true);
     release();
+    sessionStorage.removeItem("authEmail");
     toast.success("Welcome back!", {
       description: "Taking you to your portal…",
     });
@@ -240,7 +261,7 @@ export function LoginView({ type }: { type: AccountType }) {
               href={`/${type}/activate`}
               className={`text-center font-body text-[13px] font-bold tracking-wide ${accentText} transition-colors hover:text-ink`}
             >
-              ACTIVATE
+              Send activation email
             </Link>
           </div>
         )}

@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { Check } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { AccountType } from "@/lib/brand";
 
@@ -21,6 +21,7 @@ export function Checkbox({ checked, onChange, label, className, type_ = "persona
   const isPersonal = type_ === "personal";
   const accent = isPersonal ? "#22b0b5" : "#d69d1a";
   const borderColor = checked ? accent : "#d9e0e3";
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <label
@@ -31,9 +32,9 @@ export function Checkbox({ checked, onChange, label, className, type_ = "persona
       )}
     >
       <motion.span
-        className="relative flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-[6px] border-2 transition-colors focus-within:ring-2 focus-within:ring-ink/20 focus-within:ring-offset-2 focus-within:rounded-[6px]"
+        className="relative flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-[6px] border-2 transition-colors focus-within:ring-2 focus-within:ring-ink/20 focus-within:ring-offset-2"
         style={{ borderColor }}
-        animate={{ borderColor }}
+        animate={shouldReduceMotion ? undefined : { borderColor }}
         transition={{ duration: 0.2 }}
       >
         <input
@@ -47,17 +48,17 @@ export function Checkbox({ checked, onChange, label, className, type_ = "persona
         <AnimatePresence>
           {checked && (
             <motion.span
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
+              initial={shouldReduceMotion ? false : { scale: 0.5, opacity: 0 }}
+              animate={shouldReduceMotion ? { scale: 1, opacity: 1 } : { scale: 1, opacity: 1 }}
+              exit={shouldReduceMotion ? undefined : { scale: 0.5, opacity: 0 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { type: "spring", stiffness: 400, damping: 25 }}
               className="absolute inset-0 flex items-center justify-center rounded-[4px]"
               style={{ backgroundColor: accent }}
             >
               <motion.span
-                initial={{ pathLength: 0 }}
+                initial={shouldReduceMotion ? false : { pathLength: 0 }}
                 animate={{ pathLength: 1 }}
-                transition={{ duration: 0.2, delay: 0.05 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2, delay: 0.05 }}
               >
                 <Check size={12} strokeWidth={3.5} className="text-white" />
               </motion.span>

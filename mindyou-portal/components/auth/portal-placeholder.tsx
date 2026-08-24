@@ -71,7 +71,7 @@ export function PortalPlaceholder({ type }: { type: AccountType }) {
               onClick={() => router.push(`/${type}/login`)}
             >
               <span className="inline-flex items-center gap-2">
-                Sign out
+                Sign out & return to login
                 <LogOut size={15} strokeWidth={2.5} />
               </span>
             </Button>
@@ -80,7 +80,7 @@ export function PortalPlaceholder({ type }: { type: AccountType }) {
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl font-body text-[13px] font-medium text-ink/60 transition-colors hover:bg-ink/5 hover:text-ink"
             >
               <RefreshCcw size={13} strokeWidth={2.25} />
-              {copy.switchLabel}
+              Choose another account type
             </Link>
           </div>
         </motion.div>

@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthLayout } from "@/components/auth/auth-layout";
+import { FormErrorBanner } from "@/components/ui/form-error-banner";
 import { TextField } from "@/components/ui/text-field";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/toast";
@@ -19,6 +20,10 @@ export function ResendActivationView({ type }: { type: AccountType }) {
 
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState<string | undefined>();
+  const [formError, setFormError] = useState<{
+    title: string;
+    description?: string;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [bridging, setBridging] = useState(false);
@@ -46,6 +51,15 @@ export function ResendActivationView({ type }: { type: AccountType }) {
     e.preventDefault();
     if (loading || success) return;
     if (!guard()) return;
+
+    if (!navigator.onLine) {
+      setFormError({
+        title: "You're offline",
+        description: "Please reconnect to submit your request."
+      });
+      release();
+      return;
+    }
 
     if (!validateEmailField()) {
       release();
@@ -83,6 +97,13 @@ export function ResendActivationView({ type }: { type: AccountType }) {
           Resend activation email
         </h2>
 
+        <FormErrorBanner
+          open={!!formError}
+          title={formError?.title ?? ""}
+          description={formError?.description}
+          className="mb-4"
+        />
+
         <form onSubmit={handleResend} noValidate className="form-field-stagger flex flex-col gap-5">
           <TextField
             ref={emailRef}
@@ -97,11 +118,12 @@ export function ResendActivationView({ type }: { type: AccountType }) {
             onBlur={handleEmailBlur}
             error={emailError}
             valid={isValidEmail(email)}
+            hint="We'll resend the activation link to this address"
             autoComplete="email"
           />
 
           <Button type="submit" type_={type} loading={loading} success={success}>
-            Resend email
+            Resend activation email
           </Button>
         </form>
       </div>

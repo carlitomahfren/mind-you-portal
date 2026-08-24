@@ -46,8 +46,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const isPersonal = type_ === "personal";
     const solidClasses = isPersonal
-      ? "bg-gradient-to-b from-personal to-personal-dark shadow-[var(--shadow-button)] hover:shadow-[var(--shadow-glow-personal)] active:shadow-[var(--shadow-button)]"
-      : "bg-gradient-to-b from-enterprise to-enterprise-dark shadow-[var(--shadow-button)] hover:shadow-[var(--shadow-glow-enterprise)] active:shadow-[var(--shadow-button)]";
+      ? "bg-gradient-to-b from-personal to-personal-dark shadow-[var(--shadow-button)] hover:shadow-[var(--shadow-glow-personal)] active:shadow-[var(--shadow-button)] focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2"
+      : "bg-gradient-to-b from-enterprise to-enterprise-dark shadow-[var(--shadow-button)] hover:shadow-[var(--shadow-glow-enterprise)] active:shadow-[var(--shadow-button)] focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2";
 
     return (
       <motion.button
@@ -58,11 +58,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         whileTap={shouldReduceMotion || disabled || loading ? undefined : { scale: 0.975 }}
         transition={{ type: "spring", stiffness: 420, damping: 28 }}
         className={cn(
-          "relative flex h-12 sm:h-13 w-full items-center justify-center gap-2 rounded-xl px-6 text-[13px] sm:text-[14px] font-bold tracking-wider text-white transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-45",
+          "relative flex h-12 sm:h-13 w-full items-center justify-center gap-2 rounded-xl px-6 text-[13px] sm:text-[14px] font-bold tracking-wider text-white transition-[box-shadow,opacity] duration-200 disabled:cursor-not-allowed disabled:opacity-45",
           variant === "solid" && solidClasses,
           variant === "outline" &&
-            "border border-ink/15 bg-white/50 backdrop-blur-sm text-ink shadow-none hover:bg-white hover:border-ink/25 active:bg-ink/5",
-          variant === "ghost" && "bg-transparent text-ink shadow-none hover:bg-ink/5 active:bg-ink/10",
+            "border border-ink/15 bg-white/50 backdrop-blur-sm text-ink shadow-none hover:bg-white hover:border-ink/25 active:bg-ink/5 focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:ring-offset-2",
+          variant === "ghost" && "bg-transparent text-ink shadow-none hover:bg-ink/5 active:bg-ink/10 focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:ring-offset-2",
           className
         )}
         {...props}
@@ -77,8 +77,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         {!loading && success && (
           <motion.span
-            initial={shouldReduceMotion ? false : { scale: 0 }}
-            animate={{ scale: 1 }}
+            initial={shouldReduceMotion ? false : { scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
             transition={
               shouldReduceMotion
                 ? { duration: 0 }
