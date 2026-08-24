@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
-import { HeartHandshake, Building2, Sparkles } from "lucide-react";
+import { HeartHandshake, Building2, Sparkles, ArrowRight } from "lucide-react";
 import { LoadingScreen, LogoMark } from "@/components/loading/loading-screen";
 
 function MeshGradient() {
@@ -66,66 +66,89 @@ export function AccountTypeView() {
           )}
 
           <div className="flex w-full max-w-[560px] flex-col items-center">
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={
-              ready || shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }
-            }
-            transition={{
-              duration: 0.3,
-              delay: 0.45,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-personal/10 px-4 py-1.5 text-[11px] font-semibold tracking-wider text-personal-dark"
-          >
-            <Sparkles size={12} />
-            WELCOME
-          </motion.div>
-          <motion.h1
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={
-              ready || shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }
-            }
-            transition={{
-              duration: 0.3,
-              delay: 0.49,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="mb-2 text-balance text-center font-display text-[34px] font-semibold leading-[1.08] text-ink sm:mb-3 sm:text-[42px] lg:text-[50px]"
-          >
-            Welcome to Mind You!
-          </motion.h1>
-          <motion.p
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
-            animate={
-              ready || shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }
-            }
-            transition={{
-              duration: 0.3,
-              delay: 0.53,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="mb-10 text-balance text-center font-body text-[16px] font-medium leading-relaxed text-ink/70 sm:mb-11 sm:text-[18px]"
-          >
-            Please choose your account type
-          </motion.p>
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={
+                ready || shouldReduceMotion
+                  ? { opacity: 1, y: 0 }
+                  : { opacity: 0, y: 8 }
+              }
+              transition={{
+                duration: 0.3,
+                delay: 0.45,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-personal/10 px-4 py-1.5 text-[11px] font-semibold tracking-wider text-personal-dark"
+            >
+              <Sparkles size={12} />
+              WELCOME
+            </motion.div>
+            <motion.h1
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={
+                ready || shouldReduceMotion
+                  ? { opacity: 1, y: 0 }
+                  : { opacity: 0, y: 8 }
+              }
+              transition={{
+                duration: 0.3,
+                delay: 0.49,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="mb-2 text-balance text-center font-display text-[34px] font-semibold leading-[1.08] text-ink sm:mb-3 sm:text-[42px] lg:text-[50px]"
+            >
+              Welcome to Mind You!
+            </motion.h1>
+            <motion.p
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={
+                ready || shouldReduceMotion
+                  ? { opacity: 1, y: 0 }
+                  : { opacity: 0, y: 8 }
+              }
+              transition={{
+                duration: 0.3,
+                delay: 0.53,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="mb-10 text-balance text-center font-body text-[16px] font-medium leading-relaxed text-ink/70 sm:mb-11 sm:text-[18px]"
+            >
+              Please choose your account type
+            </motion.p>
 
             <div className="flex w-full flex-col justify-center gap-5 sm:flex-row sm:gap-6">
               <motion.button
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
+                initial={
+                  shouldReduceMotion
+                    ? false
+                    : { opacity: 0, y: 12, scale: 0.98 }
+                }
                 animate={
                   ready || shouldReduceMotion
                     ? { opacity: 1, y: 0, scale: 1 }
                     : { opacity: 0, y: 12, scale: 0.98 }
                 }
-                transition={{ duration: 0.35, delay: 0.62, ease: [0.16, 1, 0.3, 1] }}
+                transition={{
+                  duration: 0.35,
+                  delay: 0.62,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
                 whileHover={
                   shouldReduceMotion
                     ? undefined
-                    : { scale: 1.02, y: -3, transition: { type: "spring", stiffness: 400, damping: 26 } }
+                    : {
+                        scale: 1.02,
+                        y: -3,
+                        transition: {
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 26,
+                        },
+                      }
                 }
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
                 onClick={() => router.push("/personal/login")}
+                aria-label="Continue to Personal login"
                 className="group relative flex-1 overflow-hidden rounded-2xl shadow-[var(--shadow-card)] transition-shadow duration-300 hover:shadow-[var(--shadow-glow-personal)] focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-personal-dark outline-none"
                 style={{ minHeight: 190 }}
               >
@@ -149,24 +172,52 @@ export function AccountTypeView() {
                   </span>
                 </div>
 
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-5 right-5 flex h-9 w-9 translate-x-2 items-center justify-center rounded-full bg-white/15 opacity-0 ring-1 ring-white/30 backdrop-blur-sm transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                >
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={2.5}
+                    className="text-white"
+                  />
+                </span>
+
                 <div className="absolute inset-0 bg-gradient-to-t from-white/0 via-white/0 to-white/0 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:via-white/5 group-hover:to-white/10" />
               </motion.button>
 
               <motion.button
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
+                initial={
+                  shouldReduceMotion
+                    ? false
+                    : { opacity: 0, y: 12, scale: 0.98 }
+                }
                 animate={
                   ready || shouldReduceMotion
                     ? { opacity: 1, y: 0, scale: 1 }
                     : { opacity: 0, y: 12, scale: 0.98 }
                 }
-                transition={{ duration: 0.35, delay: 0.68, ease: [0.16, 1, 0.3, 1] }}
+                transition={{
+                  duration: 0.35,
+                  delay: 0.68,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
                 whileHover={
                   shouldReduceMotion
                     ? undefined
-                    : { scale: 1.02, y: -3, transition: { type: "spring", stiffness: 400, damping: 26 } }
+                    : {
+                        scale: 1.02,
+                        y: -3,
+                        transition: {
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 26,
+                        },
+                      }
                 }
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
                 onClick={() => router.push("/enterprise/login")}
+                aria-label="Continue to Enterprise login"
                 className="group relative flex-1 overflow-hidden rounded-2xl shadow-[var(--shadow-card)] transition-shadow duration-300 hover:shadow-[var(--shadow-glow-enterprise)] focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-enterprise-dark outline-none"
                 style={{ minHeight: 190 }}
               >
@@ -190,6 +241,17 @@ export function AccountTypeView() {
                   </span>
                 </div>
 
+                <span
+                  aria-hidden="true"
+                  className="absolute bottom-5 right-5 flex h-9 w-9 translate-x-2 items-center justify-center rounded-full bg-white/15 opacity-0 ring-1 ring-white/30 backdrop-blur-sm transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                >
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={2.5}
+                    className="text-white"
+                  />
+                </span>
+
                 <div className="absolute inset-0 bg-gradient-to-t from-white/0 via-white/0 to-white/0 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:via-white/5 group-hover:to-white/10" />
               </motion.button>
             </div>
@@ -198,12 +260,14 @@ export function AccountTypeView() {
 
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0 }}
-          animate={ready || shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+          animate={
+            ready || shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }
+          }
           transition={{ duration: 0.2, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="px-6 pb-6 sm:px-12 sm:pb-8"
         >
           <p className="font-body text-[10px] leading-relaxed text-ink-50 sm:text-[11px]">
-            National Privacy Commission No. PIC 004-457-2025
+            National Privacy Commission No. PIC-007-095-2026
             <br />
             SEC Registration No. CS202006851
             <br />
@@ -227,8 +291,6 @@ export function AccountTypeView() {
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-abyss to-transparent" />
-
-
       </div>
     </div>
   );

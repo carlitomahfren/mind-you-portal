@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Inter_Tight, SUSE } from "next/font/google";
 import { PageTransition } from "@/components/page-transition";
+import { ToastProvider } from "@/components/ui/toast";
+import { NetworkStatus } from "@/components/ui/network-status";
 import "./globals.css";
 
 const inter = Inter({
@@ -44,7 +46,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${interTight.variable} ${suse.variable}`}>
       <body className="antialiased">
-        <PageTransition>{children}</PageTransition>
+        <ToastProvider>
+          <NetworkStatus />
+          <PageTransition>{children}</PageTransition>
+        </ToastProvider>
       </body>
     </html>
   );

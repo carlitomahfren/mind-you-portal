@@ -9,12 +9,14 @@ import type { AccountType } from "@/lib/brand";
 interface CheckboxProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
-  label: string;
+  label: React.ReactNode;
   className?: string;
   type_?: AccountType;
+  /** Forwards a ref to the underlying input element. */
+  inputRef?: React.Ref<HTMLInputElement>;
 }
 
-export function Checkbox({ checked, onChange, label, className, type_ = "personal" }: CheckboxProps) {
+export function Checkbox({ checked, onChange, label, className, type_ = "personal", inputRef }: CheckboxProps) {
   const id = useId();
   const isPersonal = type_ === "personal";
   const accent = isPersonal ? "#22b0b5" : "#d69d1a";
@@ -36,6 +38,7 @@ export function Checkbox({ checked, onChange, label, className, type_ = "persona
       >
         <input
           id={id}
+          ref={inputRef}
           type="checkbox"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}

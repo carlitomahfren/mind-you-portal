@@ -40,7 +40,7 @@ function CooldownRing({ seconds }: { seconds: number }) {
   );
 }
 
-export function ActivationSentView({ type }: { type: AccountType }) {
+export function CheckEmailView({ type }: { type: AccountType }) {
   const toast = useToast();
   const shouldReduceMotion = useReducedMotion();
   const [email, setEmail] = useState<string | null>(null);
@@ -57,18 +57,21 @@ export function ActivationSentView({ type }: { type: AccountType }) {
 
   useEffect(() => {
     if (!counting) return;
-    const id = setInterval(() => setCooldown((s) => Math.max(s - 1, 0)), 1000);
+    const id = setInterval(
+      () => setCooldown((s) => Math.max(s - 1, 0)),
+      1000
+    );
     return () => clearInterval(id);
   }, [counting]);
 
   const handleResend = async () => {
     if (loading || cooldown > 0) return;
     setLoading(true);
-    // DEMO ONLY — swap this block for the real resend-activation API call.
+    // DEMO ONLY — swap for the real resend-reset-link API call.
     await new Promise((r) => setTimeout(r, 500));
     setLoading(false);
     setSuccess(true);
-    toast.success("Activation email resent", {
+    toast.success("Reset link resent", {
       description: email ? `Sent again to ${maskEmail(email)}.` : undefined,
     });
     setTimeout(() => {
@@ -77,29 +80,27 @@ export function ActivationSentView({ type }: { type: AccountType }) {
     }, 400);
   };
 
-  const accentText = type === "enterprise" ? "text-enterprise-dark" : "text-personal-dark";
-
   return (
     <AuthLayout
       type={type}
-      rightImageSrc="/72-3253.png"
+      rightImageSrc="/96-396.png"
       rightTitle="Welcome Back to Mind You!"
       rightSubtitle="We hope you've been getting the care you need through us. We strive to make Mind You as convenient and professional as possible, and we're always happy to help if you encounter any problems while using our service."
     >
       <div className="flex w-full flex-col items-center text-center">
-        <h2 className={`mb-5 font-display text-[21px] font-semibold tracking-tight sm:text-[23px] ${accentText}`}>
-          Activation email sent
+        <h2 className={`mb-5 font-display text-[21px] font-semibold tracking-tight sm:text-[23px] ${type === "enterprise" ? "text-enterprise-dark" : "text-personal-dark"}`}>
+          Check your email
         </h2>
 
         <p className="mb-8 max-w-[320px] font-body text-[14px] leading-relaxed text-ink/70 sm:text-[15px]">
-          Great! We have sent an activation email to
+          We&rsquo;ve sent a password reset link to
           <br />
           <span className="font-semibold text-ink">
             {email === null ? "the address you provided" : maskEmail(email)}
           </span>
           <br />
           <br />
-          Please follow the link in your email to access your Mind You account.
+          Click the link in your email to choose a new password.
         </p>
 
         <motion.div
@@ -139,7 +140,7 @@ export function ActivationSentView({ type }: { type: AccountType }) {
         </div>
 
         <p className="mb-4 font-body text-[13px] text-ink/60">
-          Haven&rsquo;t received the activation email?
+          Haven&rsquo;t received the email?
         </p>
 
         <Button
@@ -171,17 +172,17 @@ export function ActivationSentView({ type }: { type: AccountType }) {
                 exit={{ y: -8, opacity: 0 }}
                 transition={{ duration: 0.15, ease: "easeOut" }}
               >
-                Resend activation email
+                Resend reset link
               </motion.span>
             )}
           </AnimatePresence>
         </Button>
 
         <Link
-          href={`/${type}/activate`}
+          href={`/${type}/forgot-password`}
           className="font-body text-[13px] font-medium text-ink/50 transition-colors hover:text-ink"
         >
-          Change activation email
+          Use a different email
         </Link>
       </div>
     </AuthLayout>

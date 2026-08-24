@@ -7,6 +7,7 @@ import { ChevronLeft, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { AccountType } from "@/lib/brand";
 import { brand } from "@/lib/brand";
+import { cn } from "@/lib/utils";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -74,14 +75,15 @@ export function AuthLayout({
     const idx = HERO_IMAGES.indexOf(rightImageSrc);
     return idx !== -1 ? idx : 0;
   });
+  const [heroPaused, setHeroPaused] = useState(false);
 
   useEffect(() => {
-    if (shouldReduceMotion) return;
+    if (shouldReduceMotion || heroPaused) return;
     const id = setInterval(() => {
       setHeroIndex((prev) => (prev + 1) % HERO_IMAGES.length);
     }, 12000);
     return () => clearInterval(id);
-  }, [shouldReduceMotion]);
+  }, [shouldReduceMotion, heroPaused]);
 
   const b = brand[type];
   const accentGlow =
@@ -156,7 +158,7 @@ export function AuthLayout({
 
         <div className="flex-none border-t border-hairline/40 px-6 pb-6 pt-4 sm:px-12 sm:pb-8 sm:pt-5">
           <p className="font-body text-[10px] leading-relaxed text-ink-50 sm:text-[11px]">
-            National Privacy Commission No. PIC 004-457-2025 | SEC Registration
+            National Privacy Commission No. PIC-007-095-2026 | SEC Registration
             No. CS202006851
             <br />
             &copy; 2026 Mind You Mental Health Systems, Inc. | All Rights
@@ -190,7 +192,11 @@ export function AuthLayout({
               transition={{ duration: 0.8, ease: "easeInOut" }}
               className="absolute inset-0"
             >
-              <div className="h-full w-full">
+              <div className="relative h-full w-full">
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 animate-pulse bg-gradient-to-br from-abyss-light/40 via-abyss/50 to-abyss/70"
+                />
                 <Image
                   src={HERO_IMAGES[heroIndex]}
                   alt=""
@@ -264,6 +270,32 @@ export function AuthLayout({
             )}
           </div>
         </motion.div>
+
+        {!shouldReduceMotion && (
+          <div
+            className="absolute bottom-7 right-10 z-10 flex items-center gap-2 xl:right-14"
+            role="group"
+            aria-label="Featured images"
+          >
+            {HERO_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Show image ${i + 1} of ${HERO_IMAGES.length}`}
+                aria-pressed={i === heroIndex}
+                onClick={() => setHeroIndex(i)}
+                onMouseEnter={() => setHeroPaused(true)}
+                onMouseLeave={() => setHeroPaused(false)}
+                className={cn(
+                  "h-1.5 rounded-full outline-none transition-all duration-300 focus-visible:ring-2 focus-visible:ring-white/50",
+                  i === heroIndex
+                    ? "w-5 bg-white/80"
+                    : "w-1.5 bg-white/35 hover:bg-white/55"
+                )}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

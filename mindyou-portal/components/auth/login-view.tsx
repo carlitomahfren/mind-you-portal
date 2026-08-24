@@ -1,13 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AuthLayout } from "@/components/auth/auth-layout";
+import { FormErrorBanner } from "@/components/ui/form-error-banner";
 import { TextField } from "@/components/ui/text-field";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
+import { BrandedBridge } from "@/components/ui/branded-bridge";
+import { useSubmitGuard, useDesktopAutofocus } from "@/lib/hooks";
+import { isValidEmail } from "@/lib/validation";
+import { getDemoError, MOCK_LATENCY_MS, sleep } from "@/lib/mock-auth";
 import type { AccountType } from "@/lib/brand";
+
+const MAX_ATTEMPTS = 3;
+const LOCK_SECONDS = 30;
 
 const rightCopy: Record<
   AccountType,
@@ -29,23 +38,100 @@ const rightCopy: Record<
 
 export function LoginView({ type }: { type: AccountType }) {
   const router = useRouter();
+  const toast = useToast();
+  const { guard, release } = useSubmitGuard();
+  const emailRef = useDesktopAutofocus<HTMLInputElement>();
+  const passwordRef = useRef<HTMLInputElement | null>(null);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState<string | undefined>();
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [bridging, setBridging] = useState(false);
+
+  const [formError, setFormError] = useState<{
+    title: string;
+    description?: string;
+  } | null>(null);
+  const [attempts, setAttempts] = useState(0);
+  const [lockLeft, setLockLeft] = useState(0);
+  const locked = lockLeft > 0;
+
+  useEffect(() => {
+    if (lockLeft <= 0) return;
+    const id = setTimeout(() => setLockLeft((s) => s - 1), 1000);
+    return () => clearTimeout(id);
+  }, [lockLeft]);
+
   const copy = rightCopy[type];
   const accentText =
     type === "enterprise" ? "text-enterprise-dark" : "text-personal-dark";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validateEmail = useCallback((): boolean => {
+    if (!isValidEmail(email)) {
+      setEmailError("Enter a valid email address");
+      emailRef.current?.focus();
+      return false;
+    }
+    setEmailError(undefined);
+    return true;
+  }, [email, emailRef]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (locked || loading || success) return;
+    if (!guard()) return;
+
+    setFormError(null);
+
+    if (!validateEmail()) {
+      release();
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
+
+    // DEMO ONLY — swap this block for the real sign-in API call.
+    await sleep(MOCK_LATENCY_MS);
+    const demo = getDemoError({ email, password });
+
+    if (demo === "invalid_credentials") {
       setLoading(false);
-      setSuccess(true);
-      setTimeout(() => {
-        router.push(`/${type}`);
-      }, 400);
-    }, 500);
+      release();
+      const nextAttempt = attempts + 1;
+      if (nextAttempt >= MAX_ATTEMPTS) {
+        setAttempts(nextAttempt);
+        setLockLeft(LOCK_SECONDS);
+        setFormError({
+          title: "Too many failed attempts",
+          description:
+            "For your security, sign-in is temporarily locked. Wait for the countdown, then try again.",
+        });
+      } else {
+        setAttempts(nextAttempt);
+        const remaining = MAX_ATTEMPTS - nextAttempt;
+        setFormError({
+          title: "Incorrect email or password",
+          description: `Please try again — ${remaining} attempt${remaining > 1 ? "s" : ""} remaining before a short lock.`,
+        });
+      }
+      passwordRef.current?.focus();
+      passwordRef.current?.select();
+      return;
+    }
+
+    setLoading(false);
+    setSuccess(true);
+    release();
+    toast.success("Welcome back!", {
+      description: "Taking you to your portal…",
+    });
+    setBridging(true);
+    setTimeout(() => {
+      router.push(`/${type}`);
+    }, 450);
   };
 
   return (
@@ -56,27 +142,48 @@ export function LoginView({ type }: { type: AccountType }) {
       rightSubtitle={copy.subtitle}
       showSignUp={type === "personal"}
     >
+      <BrandedBridge show={bridging} />
       <form
         onSubmit={handleSubmit}
+        noValidate
         className="form-field-stagger flex w-full flex-col"
       >
         <h2 className="mb-7 font-display text-[21px] font-semibold tracking-tight text-ink sm:mb-8 sm:text-[23px]">
           Log in
         </h2>
 
+        <FormErrorBanner
+          open={!!formError}
+          title={formError?.title ?? ""}
+          description={formError?.description}
+          className="mb-4"
+        />
+
         <div className="mb-6 flex flex-col gap-4">
           <TextField
+            ref={emailRef}
             label="Email Address"
             type="email"
             type_={type}
-            required
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError(undefined);
+            }}
+            onBlur={validateEmail}
+            error={emailError}
+            valid={isValidEmail(email)}
             autoComplete="email"
           />
           <TextField
+            ref={(node) => {
+              passwordRef.current = node;
+            }}
             label="Password"
             type="password"
             type_={type}
-            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
           />
         </div>
@@ -96,14 +203,8 @@ export function LoginView({ type }: { type: AccountType }) {
           </Link>
         </div>
 
-        <Button
-          type="submit"
-          type_={type}
-          loading={loading}
-          success={success}
-          className="mb-5"
-        >
-          Log in
+        <Button type="submit" type_={type} loading={loading} success={success} disabled={locked} className="mb-5">
+          {locked ? `Locked · try again in ${lockLeft}s` : "Log in"}
         </Button>
 
         {type === "personal" ? (

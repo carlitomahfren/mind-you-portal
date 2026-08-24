@@ -1,27 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { TextField } from "@/components/ui/text-field";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/toast";
+import { BrandedBridge } from "@/components/ui/branded-bridge";
+import { useSubmitGuard, useDesktopAutofocus } from "@/lib/hooks";
+import { isValidEmail } from "@/lib/validation";
 import type { AccountType } from "@/lib/brand";
 
 export function ResendActivationView({ type }: { type: AccountType }) {
   const router = useRouter();
+  const toast = useToast();
+  const { guard, release } = useSubmitGuard();
+  const emailRef = useDesktopAutofocus<HTMLInputElement>();
+
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [bridging, setBridging] = useState(false);
 
-  const handleResend = (e: React.FormEvent) => {
+  const validateEmailField = useCallback((): boolean => {
+    if (!isValidEmail(email)) {
+      setEmailError("Enter a valid email address");
+      emailRef.current?.focus();
+      return false;
+    }
+    setEmailError(undefined);
+    return true;
+  }, [email, emailRef]);
+
+  const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || success) return;
+    if (!guard()) return;
+
+    if (!validateEmailField()) {
+      release();
+      return;
+    }
+
     setLoading(true);
+    // DEMO ONLY — swap this block for the real resend-activation API call.
+    await new Promise((r) => setTimeout(r, 500));
+    setLoading(false);
+    setSuccess(true);
+    release();
+    toast.success("Activation email resent", {
+      description: "Follow the link inside to activate your account.",
+    });
+    setBridging(true);
     setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-      setTimeout(() => {
-        router.push(`/${type}/activation-sent`);
-      }, 400);
-    }, 500);
+      router.push(
+        `/${type}/activation-sent?email=${encodeURIComponent(email.trim())}`
+      );
+    }, 450);
   };
 
   return (
@@ -32,16 +68,25 @@ export function ResendActivationView({ type }: { type: AccountType }) {
       rightSubtitle="We hope you've been getting the care you need through us. We strive to make Mind You as convenient and professional as possible, and we're always happy to help if you encounter any problems while using our service."
     >
       <div className="flex w-full flex-col">
+        <BrandedBridge show={bridging} />
         <h2 className="mb-8 font-display text-[21px] font-semibold tracking-tight text-ink sm:mb-9 sm:text-[23px]">
           Resend activation email
         </h2>
 
-        <form onSubmit={handleResend} className="form-field-stagger flex flex-col gap-5">
+        <form onSubmit={handleResend} noValidate className="form-field-stagger flex flex-col gap-5">
           <TextField
+            ref={emailRef}
             label={type === "enterprise" ? "Company Email Address" : "Email Address"}
             type="email"
             type_={type}
-            required
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError(undefined);
+            }}
+            onBlur={validateEmailField}
+            error={emailError}
+            valid={isValidEmail(email)}
             autoComplete="email"
           />
 
