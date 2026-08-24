@@ -63,6 +63,16 @@ export function RegisterView({ type }: { type: AccountType }) {
     return true;
   }, [email]);
 
+  // Quiet on blur while the field is still empty — errors surface via submit
+  // or once real input exists. Never steals focus back mid-form.
+  const handleEmailBlur = useCallback(() => {
+    if (!email.trim()) {
+      setEmailError(undefined);
+      return;
+    }
+    if (!isValidEmail(email)) setEmailError("Enter a valid email address");
+  }, [email]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading || success) return;
@@ -185,7 +195,7 @@ export function RegisterView({ type }: { type: AccountType }) {
               setEmail(e.target.value);
               if (emailError) setEmailError(undefined);
             }}
-            onBlur={validateEmailField}
+            onBlur={handleEmailBlur}
             error={emailError}
             valid={emailValid}
             autoComplete="email"

@@ -72,12 +72,21 @@ export function LoginView({ type }: { type: AccountType }) {
   const validateEmail = useCallback((): boolean => {
     if (!isValidEmail(email)) {
       setEmailError("Enter a valid email address");
-      emailRef.current?.focus();
       return false;
     }
     setEmailError(undefined);
     return true;
-  }, [email, emailRef]);
+  }, [email]);
+
+  // Quiet on blur while the field is still empty — errors surface via submit
+  // or once real input exists. Never steals focus back mid-form.
+  const handleEmailBlur = useCallback(() => {
+    if (!email.trim()) {
+      setEmailError(undefined);
+      return;
+    }
+    if (!isValidEmail(email)) setEmailError("Enter a valid email address");
+  }, [email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,6 +97,7 @@ export function LoginView({ type }: { type: AccountType }) {
 
     if (!validateEmail()) {
       release();
+      emailRef.current?.focus();
       return;
     }
 
@@ -170,7 +180,7 @@ export function LoginView({ type }: { type: AccountType }) {
               setEmail(e.target.value);
               if (emailError) setEmailError(undefined);
             }}
-            onBlur={validateEmail}
+            onBlur={handleEmailBlur}
             error={emailError}
             valid={isValidEmail(email)}
             autoComplete="email"
